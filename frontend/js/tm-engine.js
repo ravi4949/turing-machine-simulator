@@ -23,7 +23,7 @@ var TM = {
 
 // ── API calls ─────────────────────────────────────────────────────────────────
 
-var API_BASE = window.location.protocol === 'file:' || (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.port !== '3001') ? 'http://localhost:3001' : '';
+var API_BASE = window.location.protocol === 'file:' ? 'http://localhost:3001' : '';
 
 function apiFetchMachines() {
   return fetch(API_BASE + '/api/machines')
