@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Turing Machine Visualizer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- PAGE 1: LANDING -->
+<section id="page-landing" class="page active">
+  <canvas id="particle-canvas" class="particle-canvas"></canvas>
+  <nav class="topnav">
+    <div class="brand"><span class="brand-icon">⊢</span> TM Visualizer</div>
+  </nav>
+  <div class="landing-wrap">
+    <div class="landing-pill">Theory of Computation</div>
+    <h1 class="landing-h1">Turing<br/><em>Machine</em><br/>Visualizer</h1>
+    <p class="landing-p">A <strong>Turing Machine</strong> is the theoretical foundation of all modern computing — an infinite tape, a read/write head, and a finite set of states connected by transition rules. Explore it interactively.</p>
+    <div class="landing-btns">
+      <button class="btn-primary" onclick="navigate('page-select')">Start Simulation →</button>
+      <button class="btn-ghost"   onclick="navigate('page-learn')">Learn Concepts</button>
+    </div>
+    <div class="landing-stats">
+      <div><span>3</span><label>Machines</label></div>
+      <div><span>∞</span><label>Tape</label></div>
+      <div><span>δ</span><label>Transitions</label></div>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE 2: LEARN -->
+<section id="page-learn" class="page">
+  <nav class="topnav sticky">
+    <button class="back-btn" onclick="navigate('page-landing')">← Back</button>
+    <div class="brand"><span class="brand-icon">⊢</span> TM Visualizer</div>
+  </nav>
+  <div class="container">
+    <h2 class="page-title">Theory of Computation</h2>
+    <p class="page-sub">Core concepts behind the Turing Machine model</p>
+    <div class="concept-grid">
+      <div class="concept-card"><div class="cicon">📼</div><h3>The Tape</h3><p>An infinite sequence of cells, each holding one symbol from the tape alphabet Γ. Initially populated with the input; remaining cells hold blank (B).</p></div>
+      <div class="concept-card"><div class="cicon">🔵</div><h3>States (Q)</h3><p>A finite set of internal configurations. Always includes a start state q₀, accept state q_accept, and reject state q_reject.</p></div>
+      <div class="concept-card"><div class="cicon">δ</div><h3>Transition Function</h3><p>δ: Q × Γ → Q × Γ × {L, R}. Given the current state and tape symbol, it returns a new state, writes a symbol, and moves the head Left or Right.</p></div>
+      <div class="concept-card"><div class="cicon">✓</div><h3>Acceptance</h3><p>A string is accepted if the machine enters q_accept. It is rejected if it enters q_reject or if no transition is defined (implicit reject).</p></div>
+      <div class="concept-card"><div class="cicon">⚙️</div><h3>Configuration</h3><p>A snapshot: (state, tape contents, head position). The simulation history is a sequence of configurations, one per step.</p></div>
+      <div class="concept-card"><div class="cicon">∞</div><h3>Turing-Completeness</h3><p>A system is Turing-complete if it can simulate any Turing Machine. Modern CPUs and languages are all Turing-complete.</p></div>
+    </div>
+    <div class="formal-box">
+      <h3>Formal Definition: M = (Q, Σ, Γ, δ, q₀, q_accept, q_reject)</h3>
+      <ul>
+        <li><strong>Q</strong> — finite set of states</li>
+        <li><strong>Σ</strong> — input alphabet (no blank)</li>
+        <li><strong>Γ</strong> — tape alphabet (Σ ⊂ Γ, B ∈ Γ)</li>
+        <li><strong>δ</strong> — transition function: Q × Γ → Q × Γ × {L,R}</li>
+        <li><strong>q₀</strong> — start state</li>
+        <li><strong>q_accept, q_reject</strong> — halting states</li>
+      </ul>
+    </div>
+    <div style="text-align:center;margin-top:2rem">
+      <button class="btn-primary" onclick="navigate('page-select')">Try the Simulator →</button>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE 3: SELECT MACHINE -->
+<section id="page-select" class="page">
+  <nav class="topnav sticky">
+    <button class="back-btn" onclick="navigate('page-landing')">← Back</button>
+    <div class="brand"><span class="brand-icon">⊢</span> TM Visualizer</div>
+  </nav>
+  <div class="container">
+    <h2 class="page-title">Select a Machine</h2>
+    <p class="page-sub">Choose a Turing Machine to simulate</p>
+    <div id="machine-cards" class="machine-grid">
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+      <div class="skeleton"></div>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE 3.5: BUILD CUSTOM MACHINE -->
+<section id="page-build" class="page" style="display:none">
+  <nav class="topnav sticky">
+    <button class="back-btn" onclick="navigate('page-select')">← Back</button>
+    <div class="brand"><span class="brand-icon">⊢</span> TM Visualizer</div>
+  </nav>
+  <div class="container">
+    <h2 class="page-title">Build Custom Machine</h2>
+    <p class="page-sub">Define states and transitions for your Turing Machine</p>
+    
+    <div class="builder-layout">
+      <div class="build-block">
+        <div class="block-title">Machine Details</div>
+        <input type="text" id="custom-machine-name" class="tm-input" placeholder="e.g. My Custom TM" value="Custom Machine" style="width: 100%; max-width: 400px;" />
+      </div>
+      <div class="build-block">
+        <div class="block-title">Transitions</div>
+        <div class="builder-table-container">
+          <table id="builder-table" class="builder-table">
+            <thead>
+              <tr>
+                <th>Current State</th>
+                <th>Read Symbol</th>
+                <th>Next State</th>
+                <th>Write Symbol</th>
+                <th>Direction</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="builder-tbody">
+              <!-- dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+        <button class="btn-ghost" onclick="builderAddRow()" style="margin-top: 10px;">+ Add Transition</button>
+      </div>
+      
+      <div class="build-block" style="margin-top:20px;">
+        <div id="build-error" class="input-err" style="margin-bottom:10px;"></div>
+        <button class="btn-primary" onclick="builderSaveAndSimulate()">Save & Simulate →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAGE 4: SIMULATOR -->
+<section id="page-sim" class="page">
+  <nav class="topnav sticky">
+    <button class="back-btn" onclick="navigate('page-select')">← Machines</button>
+    <div class="brand"><span class="brand-icon">⊢</span> TM Visualizer</div>
+    <div id="machine-badge" class="machine-badge"></div>
+  </nav>
+
+  <div class="sim-layout">
+
+    <!-- LEFT: State Diagram -->
+    <aside class="graph-panel">
+      <div class="panel-title">
+        <span>STATE DIAGRAM</span>
+        <div class="zoom-btns">
+          <button onclick="tmZoomIn()">+</button>
+          <button onclick="tmZoomOut()">−</button>
+          <button onclick="tmZoomReset()">⊙</button>
+        </div>
+      </div>
+      <div id="graph-container"></div>
+      <div class="graph-legend">
+        <span class="leg leg-cyan">Start</span>
+        <span class="leg leg-green">Accept</span>
+        <span class="leg leg-red">Reject</span>
+        <span class="leg leg-yellow">Active</span>
+      </div>
+    </aside>
+
+    <!-- RIGHT: Sim Controls -->
+    <main class="sim-panel">
+
+      <!-- Input -->
+      <div class="sim-block">
+        <div class="block-title">INPUT</div>
+        <div class="input-row">
+          <input id="input-string" class="tm-input" type="text" placeholder="Enter binary string (0s and 1s)…" maxlength="64" autocomplete="off"/>
+          <button class="btn-primary" id="check-btn" onclick="handleCheck()">Check String</button>
+        </div>
+        <div id="input-error" class="input-err"></div>
+        <div id="example-chips" class="chip-row"></div>
+      </div>
+
+      <!-- Tape -->
+      <div class="sim-block" id="tape-block" style="display:none">
+        <div class="block-title">
+          TAPE
+          <span id="step-counter" class="step-pill">Step 0</span>
+        </div>
+        <div class="tape-outer">
+          <div id="tape-scroll"><div id="tape-cells"></div></div>
+          <div id="head-ptr">▲</div>
+        </div>
+      </div>
+
+      <!-- Transition -->
+      <div class="sim-block" id="trans-block" style="display:none">
+        <div class="block-title">CURRENT TRANSITION</div>
+        <div class="trans-box">
+          <div id="trans-formula" class="trans-formula">—</div>
+          <div class="trans-meta">
+            <span>State: <strong id="lbl-state">—</strong></span>
+            <span>Read: <strong id="lbl-read">—</strong></span>
+            <span>Write: <strong id="lbl-write">—</strong></span>
+            <span>Move: <strong id="lbl-dir">—</strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div class="sim-block" id="ctrl-block" style="display:none">
+        <div class="block-title">CONTROLS</div>
+        <div class="ctrl-row">
+          <button class="ctrl-btn" id="btn-prev"  onclick="tmStepBack()"    title="Step Back">⏮</button>
+          <button class="ctrl-btn" id="btn-fwd"   onclick="tmStepForward()" title="Step Forward">⏭</button>
+          <button class="ctrl-btn" id="btn-play"  onclick="tmTogglePlay()"  title="Play/Pause">▶</button>
+          <button class="ctrl-btn" id="btn-reset" onclick="tmReset()"       title="Reset">⟳</button>
+        </div>
+        <div class="speed-row">
+          <label>Speed</label>
+          <input type="range" id="speed-slider" min="1" max="10" value="5" oninput="document.getElementById('speed-lbl').textContent=this.value+'x'"/>
+          <span id="speed-lbl">5x</span>
+        </div>
+      </div>
+
+      <!-- Log -->
+      <div class="sim-block" id="log-block" style="display:none">
+        <div class="block-title">
+          EXECUTION LOG
+          <button class="icon-btn" onclick="tmToggleLog()">▼</button>
+        </div>
+        <div id="history-log" class="history-log"></div>
+      </div>
+
+      <!-- Result -->
+      <div id="result-banner" class="result-banner" style="display:none">
+        <div id="res-icon" class="res-icon"></div>
+        <div id="res-text" class="res-text"></div>
+        <div id="res-sub"  class="res-sub"></div>
+        <button class="btn-ghost" style="margin-top:14px" onclick="tmReset()">Try Another String</button>
+      </div>
+
+    </main>
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="js/tm-engine.js"></script>
+<script src="js/tm-graph.js"></script>
+<script src="js/tm-tape.js"></script>
+<script src="js/tm-app.js"></script>
+</body>
+</html>
